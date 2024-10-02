@@ -24,7 +24,8 @@ class Logger:
             vals_str=""
 
             # TODO Part 5: Write the values from the list to the file
-            ...
+            for val in values_list:
+                vals_str += str(val) + "\n"
             
             vals_str+="\n"
             
@@ -85,7 +86,19 @@ def euler_from_quaternion(quat):
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
-    ... # just unpack yaw
+
+    w = quat[3]
+    x = quat[0]
+    y = quat[1]
+    z = quat[2]
+
+    quaternion_to_rMatrix = [
+        [(w ** 2) + (x ** 2) - (y ** 2) - (z ** 2), (2(x*y - w*z)), 2(w*y + x*z)],
+        [(2(w*z - x*y)), (w ** 2) - (x ** 2) + (y ** 2) - (z ** 2), (2(y*z - w*x))],
+        [(2(x*z - w*y)), (2(w*x + y*z)), (w ** 2) - (x ** 2) - (y ** 2) + (z ** 2)],
+    ]
+
+    # just unpack yaw
     return yaw
 
 
