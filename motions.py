@@ -55,15 +55,15 @@ class motion_executioner(Node):
         # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
         # IMU subscription
         
-        self.subscriptions=self.create_subscription(LaserScan, "/scan", self.laser_callback, qos)
+        self.subscription=self.create_subscription(Imu, "/imu", self.imu_callback, qos)
         
         # ENCODER subscription
 
-        self.subscriptions=self.create_subscription(Odometry, "/odom", self.odom_callback, qos)
+        self.subscription=self.create_subscription(Odometry, "/odom", self.odom_callback, qos)
         
         # LaserScan subscription 
         
-        self.subscriptions=self.create_subscription(Imu, "/imu", self.imu_callback, qos)
+        self.subscription=self.create_subscription(LaserScan, "/scan", self.laser_callback, qos)
         
         self.create_timer(0.1, self.timer_callback)
 
@@ -77,37 +77,52 @@ class motion_executioner(Node):
     def imu_callback(self, imu_msg: Imu):
         # log imu msgs
         timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
-        imu_msg.angular_velocity.z
-        imu_msg.linear_acceleration.x
-        imu_msg.linear_acceleration.y
+        angular_z = imu_msg.angular_velocity.z
+        acc_x = imu_msg.linear_acceleration.x
+        acc_y = imu_msg.linear_acceleration.y
       
-        quat=[  imu_msg.orientation.x
-        ,imu_msg.orientation.y
-        ,imu_msg.orientation.z
-        ,imu_msg.orientation.w]
-        yaw=euler_from_quaternion(quat)
+        self.imu_logger.log_values([acc_x, acc_y, angular_z, timestamp])
         
     def odom_callback(self, odom_msg: Odometry):
-        
+        #log odometry msgs
         timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
-        odom_orientation = odom_msg.pose.pose.orientation
-        odom_x_pos = odom_msg.pose.pose.position.x
-        odom_y_pos = odom_msg.pose.pose.position # log odom msgs
+        x_pos = odom_msg.pose.pose.position.x
+        y_pos = odom_msg.pose.pose.position.y 
 
-        print(f'Message Timestamp = {timestamp}')
-        print(f'Current Robot Orientation = {odom_orientation}')
-        print(f'Current Robot X Position = {odom_x_pos}')
-        print(f'Current Robot Y Position = {odom_y_pos}')
+        quat_w = odom_msg.pose.pose.orientation.w
+        quat_x = odom_msg.pose.pose.orientation.x
+        quat_y = odom_msg.pose.pose.orientation.y
+        quat_z = odom_msg.pose.pose.orientation.z
+
+        quat = [
+            quat_x,
+            quat_y,
+            quat_z,
+            quat_w
+        ]
+        yaw = euler_from_quaternion(quat) # find theta to be logged
+
+        # pass as list
+        self.odom_logger.log_values([x_pos, y_pos, yaw, timestamp])
+
             
     def laser_callback(self, laser_msg: LaserScan):
         # log laser msgs with position msg at that time   
         timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
-        laser_msg.angle_max
-        laser_msg.angle_min
-        laser_msg.angle_increment
-        laser_msg.range_max
-        laser_msg.range_min
-        laser_msg.scan_time
+        ranges = laser_msg.ranges
+        angle_increment = laser_msg.angle_increment
+
+        filtered_ranges = []
+        range_min = laser_msg.range_min
+        range_max = laser_msg.range_max
+
+        # filter laser ranges - for Plotting Lidar Data
+        for range in ranges:
+            # if range != 'inf' and range != 'NaN':
+            if (range > range_min) and (range < range_max):
+                filtered_ranges.append(range)
+                
+        self.laser_logger.log_values([filtered_ranges, angle_increment, timestamp])
 
     def timer_callback(self):
         
@@ -198,6 +213,6 @@ if __name__=="__main__":
     except KeyboardInterrupt:
         print("Exiting")
 
-    # ----- added because missing, but commented for now (depends if explicit shutdown needed) -----
-    # ME.destroy_node()
-    # rclpy.shutdown()
+    # missing destroy, shutdown node
+    ME.destroy_node()
+    rclpy.shutdown()

@@ -25,7 +25,7 @@ class Logger:
 
             # TODO Part 5: Write the values from the list to the file
             for val in values_list:
-                vals_str += str(val) + "\n"
+                vals_str += str(val) + ", "
             
             vals_str+="\n"
             
@@ -92,11 +92,27 @@ def euler_from_quaternion(quat):
     y = quat[1]
     z = quat[2]
 
-    quaternion_to_rMatrix = [
-        [(w ** 2) + (x ** 2) - (y ** 2) - (z ** 2), (2(x*y - w*z)), 2(w*y + x*z)],
-        [(2(w*z - x*y)), (w ** 2) - (x ** 2) + (y ** 2) - (z ** 2), (2(y*z - w*x))],
-        [(2(x*z - w*y)), (2(w*x + y*z)), (w ** 2) - (x ** 2) - (y ** 2) + (z ** 2)],
-    ]
+    # quaternion_to_rMatrix = [
+    #     [(w ** 2) + (x ** 2) - (y ** 2) - (z ** 2), (2(x*y - w*z)), 2(w*y + x*z)],
+    #     [(2(w*z - x*y)), (w ** 2) - (x ** 2) + (y ** 2) - (z ** 2), (2(y*z - w*x))],
+    #     [(2(x*z - w*y)), (2(w*x + y*z)), (w ** 2) - (x ** 2) - (y ** 2) + (z ** 2)],
+    # ]
+
+    # roll (x-axis rotation)
+    sinr_cosp = 2 * (w * x + y * z)
+    cosr_cosp = 1 - 2 * (x * x + y * y)
+    roll = atan2(sinr_cosp, cosr_cosp)
+
+    # pitch (y-axis rotation)
+    pitch = asin(2*(w * y - x * z))
+    # sinp = sqrt(1 + 2 * (q.w * q.y - q.x * q.z))
+    # cosp = sqrt(1 - 2 * (q.w * q.y - q.x * q.z))
+    # pitch = 2 * tan2(sinp, cosp) - M_PI / 2
+
+    # yaw (z-axis rotation)
+    siny_cosp = 2 * (w * z + x * y)
+    cosy_cosp = 1 - 2 * (y * y + z * z)
+    yaw = atan2(siny_cosp, cosy_cosp)
 
     # just unpack yaw
     return yaw
