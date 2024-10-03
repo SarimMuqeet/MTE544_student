@@ -34,10 +34,16 @@ class motion_executioner(Node):
         
         self.radius_=0.0
         
-        self.successful_init=False
-        self.imu_initialized=False
-        self.odom_initialized=False
-        self.laser_initialized=False
+        # self.successful_init=False
+        # self.imu_initialized=False
+        # self.odom_initialized=False
+        # self.laser_initialized=False
+
+        # To test simulation:
+        self.successful_init=True
+        self.imu_initialized=True
+        self.odom_initialized=True
+        self.laser_initialized=True
 
         
         # TODO Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
@@ -157,8 +163,8 @@ class motion_executioner(Node):
         msg=Twist()
         # fill up the twist msg for circular motion
         #const linear and angular velocity
-        msg.linear.x = 1
-        msg.angular.z = 1
+        msg.linear.x = 1.0
+        msg.angular.z = 1.0
         return msg
 
     def make_spiral_twist(self):
@@ -167,15 +173,15 @@ class motion_executioner(Node):
         #const angular velocity, increasing linear velocity
         increase_rate = 0.1
         msg.linear.x += increase_rate
-        msg.angular.z = 1
+        msg.angular.z = 1.0
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
         # fill up the twist msg for line motion
         #const linear velocity nd 0 angular velocity
-        msg.linear.x = 1
-        msg.linear.y = 1
+        msg.linear.x = 1.0
+        msg.linear.y = 1.0
         return msg
 
 import argparse
