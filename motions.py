@@ -1,6 +1,6 @@
 # Imports
 import rclpy
-
+import math
 from rclpy.node import Node
 
 from utilities import Logger, euler_from_quaternion
@@ -119,17 +119,33 @@ class motion_executioner(Node):
         angle_increment = laser_msg.angle_increment
 
         filtered_ranges = []
+        x_cart = []
+        y_cart = []
+
         range_min = laser_msg.range_min
         range_max = laser_msg.range_max
 
-        # filter laser ranges - for Plotting Lidar Data
-        for range in ranges:
-            # if range != 'inf' and range != 'NaN':
-            if (range > range_min) and (range < range_max):
-                filtered_ranges.append(range)
-                
-        self.laser_logger.log_values([filtered_ranges, angle_increment, timestamp])
+        angle_min = laser_msg.angle_min
+        angle_max = laser_msg.angle_max
 
+        #filter laser ranges - for Plotting Lidar Data
+        # angle = angle_min
+        # for range in ranges:
+
+            
+        #     if (math.isinf(range) == False and math.isnan(range) == False):
+        #     #if (range > range_min) and (range < range_max)
+        #         filtered_ranges.append(range)
+        #         x_cart.append(math.cos(angle)*range)
+        #         y_cart.append(math.sin(angle)*range)
+
+        #     angle += angle_increment
+
+    
+                
+        #self.laser_logger.log_values([x_cart, y_cart, angle_increment, timestamp])
+        self.laser_logger.log_values([ranges, angle_increment, timestamp])
+ 
     def timer_callback(self):
         
         if self.odom_initialized and self.laser_initialized and self.imu_initialized:
@@ -163,25 +179,25 @@ class motion_executioner(Node):
         msg=Twist()
         # fill up the twist msg for circular motion
         #const linear and angular velocity
-        msg.linear.x = 1.0
-        msg.angular.z = 1.0
+        msg.linear.x = 0.2
+        msg.angular.z = 0.5
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
         # fill up the twist msg for spiral motion
         #const angular velocity, increasing linear velocity
-        increase_rate = 0.1
+        increase_rate = 0.05
         msg.linear.x += increase_rate
-        msg.angular.z = 1.0
+        msg.angular.z = 0.3
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
         # fill up the twist msg for line motion
         #const linear velocity nd 0 angular velocity
-        msg.linear.x = 1.0
-        msg.linear.y = 1.0
+        msg.linear.x = 0.1
+        msg.linear.y = 0.0
         return msg
 
 import argparse
