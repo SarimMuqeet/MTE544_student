@@ -49,9 +49,11 @@ df_cleaned.to_csv(output_file, index=False, header=False)  # Replace 'cleaned_ou
 #print(df_cleaned)
 
 cleaned_df = pd.read_csv(output_file, header = None)
-print(cleaned_df.shape)
+#print(cleaned_df.shape)
 #Angle increment
-angle_increment = df.iloc[0, -2]  # 0 for the first row, -2 for the second last column
+angle_increment = df.iloc[0, -3]  # 0 for the first row, -2 for the second last column
+
+print(angle_increment)
 
 angle = 0
 x_cart = []
@@ -59,7 +61,7 @@ y_cart = []
 
 # print("angle increment" + angle_increment + '\n')
 
-# #Extracted one single line of the CSV up to this point. Now we filter for inf and NaN
+#Extracted one single line of the CSV up to this point. Now we filter for inf and NaN
 
 for readings in (cleaned_df-2): #take out last 2, since those are angle increment and timestamps
     #Take the angle, then multiply by sin and cos to get x and y, then convert            
