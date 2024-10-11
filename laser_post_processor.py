@@ -5,8 +5,12 @@ import math
 import matplotlib.pyplot as plt
 
 
-# Load the CSV file
-input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_line.csv'  # Replace with your CSV file path
+# Load the CSV file Uncomment to load
+# input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_line.csv'  # Replace with your CSV file path
+# input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_circle.csv'  # Replace with your CSV file path
+input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_spiral.csv'  # Replace with your CSV file path
+
+#Helper file
 output_file = 'cleaned_output.csv'
 
 #Define a custom function to parse the array from string format (if it's a stringified array)
@@ -17,7 +21,7 @@ def parse_array(array_str):
         print(f"Error parsing array: {array_str}")
         return None
 
-# Function to clean data
+# Function to clean data, removing the brackets from entries (weirdly couldnt evaluate the array using eval or ast.literal_eval)
 def clean_data(value):
     if isinstance(value, str):  # Check if the value is a string
         # Remove brackets and leading/trailing spaces
@@ -25,7 +29,7 @@ def clean_data(value):
     return value  # Return the value unchanged if it's not a string
 
 
-# Read the second row only (skip the first row with headers)
+# Read the second row only (skip the first row, dont need headers)
 df = pd.read_csv(input_file, skiprows=1, nrows=1, header=None)
 
 # Parse the first column which contains the array-like data
@@ -55,7 +59,7 @@ angle_increment = df.iloc[0, -3]  # 0 for the first row, -2 for the second last 
 
 print(angle_increment)
 
-angle = 0
+angle = 0.5
 x_cart = []
 y_cart = []
 
@@ -63,15 +67,16 @@ y_cart = []
 
 #Extracted one single line of the CSV up to this point. Now we filter for inf and NaN
 
-for readings in (cleaned_df-2): #take out last 2, since those are angle increment and timestamps
+for readings in cleaned_df.iloc[:, :-2].values: #take out last 2, since those are angle increment and timestamps
+    for reading in readings:
     #Take the angle, then multiply by sin and cos to get x and y, then convert            
-            if (math.isinf(readings) == False and math.isnan(readings) == False):
+            if (math.isinf(reading) == False and math.isnan(reading) == False):
             #if (range > range_min) and (range < range_max)
-                x_cart.append(math.cos(angle)*readings)
-                y_cart.append(math.sin(angle)*readings)
+                x_cart.append(math.cos(angle)*reading)
+                y_cart.append(math.sin(angle)*reading)
             angle += angle_increment
 
-print(x_cart + y_cart)
+#print(x_cart + y_cart)
 
 #plotting x_cart vs y_cart
 plt.scatter(x_cart, y_cart)
