@@ -19,10 +19,10 @@ def plot_distances(filename):
     time = time / 1e9
 
     # Get position values
-    x_pos, y_pos = get_pos_from_vel(x_vel, y_vel, th_pos, time)
+    #x_pos, y_pos = get_pos_from_vel(x_vel, y_vel, th_pos, time)
 
     # Plotting x_pos vs y_pos
-    plt.scatter(x_pos, y_pos, label="Position")
+    plt.scatter(x_vel, y_vel, label="Position")
     plt.title('Robot XY Position from Odom')
     plt.xlabel('Distance (m)')
     plt.ylabel('Distance (m)')
