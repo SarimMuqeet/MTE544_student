@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 
 # Load the CSV file Uncomment to load
-# input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_line.csv'  # Replace with your CSV file path
+input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_line.csv'  # Replace with your CSV file path
 # input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_circle.csv'  # Replace with your CSV file path
-input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_spiral.csv'  # Replace with your CSV file path
+# input_file = '/home/przhan/MTE544_student/Raw Data/laser_content_spiral.csv'  # Replace with your CSV file path
 
 #Helper file
 output_file = 'cleaned_output.csv'
@@ -29,7 +29,7 @@ def clean_data(value):
     return value  # Return the value unchanged if it's not a string
 
 
-# Read the second row only (skip the first row, dont need headers)
+# Read the second row only (skip the first row of headers)
 df = pd.read_csv(input_file, skiprows=1, nrows=1, header=None)
 
 # Parse the first column which contains the array-like data
@@ -38,10 +38,10 @@ df[0] = df[0].apply(parse_array)
 # Get the second line (which is now the only line in df after skipping the header)
 second_line = df.iloc[0]
 
-# Convert the second line to a DataFrame to write it easily to a CSV
+# Convert the second line to a DataFrame to write it to a CSV
 df_second_line = pd.DataFrame([second_line])
 
-# Write the second line to a new CSV file
+# Write the second line to a new CSV file (use this to check using Excel for correct parsing)
 df_second_line.to_csv('temp_file.csv', index=False, header=False)
 
 # Apply the clean_data function to all cells in the DataFrame
@@ -81,5 +81,8 @@ for readings in cleaned_df.iloc[:, :-2].values: #take out last 2, since those ar
 #plotting x_cart vs y_cart
 plt.scatter(x_cart, y_cart)
 plt.legend()
+plt.title('Line: First LaserScan')
+plt.xlabel('Distance from Robot(m)')
+plt.ylabel('Distance from Robot(m)')
 plt.grid()
 plt.show()
