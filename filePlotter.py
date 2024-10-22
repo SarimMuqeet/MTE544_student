@@ -20,8 +20,8 @@ def plot_errors(filename):
     plt.plot([lin[0] for lin in values], [lin[1] for lin in values])
     plt.legend()
     plt.xlabel('Time elapsed (ns)')
-    plt.ylabel('Velocity (m/s)')
-    plt.title('Spiral: Odom')
+    plt.ylabel('Position (m)')
+    plt.title('Line: Odom')
     plt.grid()
     plt.show()
     
