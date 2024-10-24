@@ -72,12 +72,20 @@ class decision_maker(Node):
         vel_msg=Twist()
         
         # TODO Part 3: Check if you reached the goal
-        target_linear_err = 1e-6
-        target_angular_err = 1e-6
-        if type(self.goal) == list and (calculate_linear_error() < target_linear_err) and (calculate_angular_error() < target_angular_err):
-            reached_goal = True
-        else: 
+
+        # V1
+        # target_linear_err = 1e-6
+        # target_angular_err = 1e-6
+        # if type(self.goal) == list and (calculate_linear_error() < target_linear_err) and (calculate_angular_error() < target_angular_err):
+        #     reached_goal = True
+        # else: 
+        #     reached_goal = False
+
+        # V2 - with trajectory in mind, makes sense for goal to be false until final point (program exit)
+        if type(self.goal) == list:
             reached_goal = False
+        else: 
+            reached_goal = True
         
 
         if reached_goal:
@@ -96,12 +104,22 @@ class decision_maker(Node):
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
         #TODO Part 4: Publish the velocity to move the robot
-        # get updated velocities using PID controller
-        updated_vel = self.controller.vel_request(self.localizer.getPose(), self.goal, reached_goal)
+
+        # V1
+        # # get updated velocities using PID controller
+        # updated_vel = self.controller.vel_request(self.localizer.getPose(), self.goal, reached_goal)
+        # #construct new twist message with these updated velocities
+        # cmd_vel_msg = Twist()
+        # cmd_vel_msg.linear.x = updated_vel[0]
+        # cmd_vel_msg.angular.z = updated_vel[1]
+
+        # self.publisher.publish(cmd_vel_msg)
+        
+        # V2 - with trajectory in mind, also use pre-calculated velocity, yaw_rate
         #construct new twist message with these updated velocities
         cmd_vel_msg = Twist()
-        cmd_vel_msg.linear.x = updated_vel[0]
-        cmd_vel_msg.angular.z = updated_vel[1]
+        cmd_vel_msg.linear.x = velocity
+        cmd_vel_msg.angular.z = yaw_rate
 
         self.publisher.publish(cmd_vel_msg)
 
