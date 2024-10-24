@@ -63,7 +63,7 @@ class decision_maker(Node):
         
         # TODO Part 3: Run the localization node
         ...    # Remember that this file is already running the decision_maker node.
-        spin_once({self.localizer})
+        spin_once(self.localizer)
 
         if self.localizer.getPose()  is  None:
             print("waiting for odom msgs ....")
@@ -74,22 +74,26 @@ class decision_maker(Node):
         # TODO Part 3: Check if you reached the goal
 
         # V1
-        # target_linear_err = 1e-6
-        # target_angular_err = 1e-6
-        # if type(self.goal) == list and (calculate_linear_error() < target_linear_err) and (calculate_angular_error() < target_angular_err):
-        #     reached_goal = True
-        # else: 
-        #     reached_goal = False
-
-        # V2 - with trajectory in mind, makes sense for goal to be false until final point (program exit)
+        target_linear_err = 1e-6
+        target_angular_err = 1e-6
         if type(self.goal) == list:
             reached_goal = False
         else: 
-            reached_goal = True
+            if (calculate_linear_error(self.localizer.getPose(), self.goal) < target_linear_err) and (calculate_angular_error(self.localizer.getPose(), self.goal)  < target_angular_err):
+                reached_goal = True
+            else:
+                reached_goal = False
+
+        # V2 - with trajectory in mind, makes sense for goal to be false until final point (program exit)
+        # if type(self.goal) == list:
+        #     reached_goal = False
+        # else: 
+        #     reached_goal = True
         
 
         if reached_goal:
             print("reached goal")
+            #QUESTION : send 0 speed at goal point?
             self.publisher.publish(vel_msg)
             
             self.controller.PID_angular.logger.save_log()
@@ -118,8 +122,8 @@ class decision_maker(Node):
         # V2 - with trajectory in mind, also use pre-calculated velocity, yaw_rate
         #construct new twist message with these updated velocities
         cmd_vel_msg = Twist()
-        cmd_vel_msg.linear.x = velocity
-        cmd_vel_msg.angular.z = yaw_rate
+        cmd_vel_msg.linear.x = float(velocity)
+        cmd_vel_msg.angular.z = float(yaw_rate)
 
         self.publisher.publish(cmd_vel_msg)
 
@@ -136,7 +140,7 @@ def main(args=None):
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
     #added for publisher msg
-    twist_msg = Twist()
+    twist_msg = Twist
     twist_topic = '/cmd_vel'
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
