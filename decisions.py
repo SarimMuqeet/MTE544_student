@@ -29,7 +29,7 @@ class decision_maker(Node):
         super().__init__("decision_maker")
 
         #TODO Part 4: Create a publisher for the topic responsible for robot's motion
-        self.publisher=... 
+        self.publisher = self.create_publisher(publisher_msg, publishing_topic, rate)
 
         publishing_period=1/rate
         
@@ -63,6 +63,7 @@ class decision_maker(Node):
         
         # TODO Part 3: Run the localization node
         ...    # Remember that this file is already running the decision_maker node.
+        spin_once({self.localizer})
 
         if self.localizer.getPose()  is  None:
             print("waiting for odom msgs ....")
@@ -71,10 +72,12 @@ class decision_maker(Node):
         vel_msg=Twist()
         
         # TODO Part 3: Check if you reached the goal
-        if type(self.goal) == list:
-            reached_goal=...
+        target_linear_err = 1e-6
+        target_angular_err = 1e-6
+        if type(self.goal) == list and (calculate_linear_error() < target_linear_err) and (calculate_angular_error() < target_angular_err):
+            reached_goal = True
         else: 
-            reached_goal=...
+            reached_goal = False
         
 
         if reached_goal:
@@ -85,12 +88,22 @@ class decision_maker(Node):
             self.controller.PID_linear.logger.save_log()
             
             #TODO Part 3: exit the spin
-            ... 
+            try:
+                spin(self)
+            except SystemExit:
+                print("reached there successfully {self.localizer.pose}")
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
         #TODO Part 4: Publish the velocity to move the robot
-        ... 
+        # get updated velocities using PID controller
+        updated_vel = self.controller.vel_request(self.localizer.getPose(), self.goal, reached_goal)
+        #construct new twist message with these updated velocities
+        cmd_vel_msg = Twist()
+        cmd_vel_msg.linear.x = updated_vel[0]
+        cmd_vel_msg.angular.z = updated_vel[1]
+
+        self.publisher.publish(cmd_vel_msg)
 
 import argparse
 
@@ -103,13 +116,16 @@ def main(args=None):
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
     
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
-    
+
+    #added for publisher msg
+    twist_msg = Twist()
+    twist_topic = '/cmd_vel'
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
-        DM=decision_maker(...)
+        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[2,2], rate=10, motion_type=POINT_PLANNER)
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(...)
+        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[2,2], rate=10, motion_type=TRAJECTORY_PLANNER)
     else:
         print("invalid motion type", file=sys.stderr)        
     
