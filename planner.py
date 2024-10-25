@@ -41,6 +41,10 @@ class planner:
                 x_val = i
                 y_val_parabola = x_val ** 2
                 trajectory_points.append([x_val, y_val_parabola])
+            # for i in range(0, 16, 1):
+            #     x_val = i/10.0
+            #     y_val_parabola = x_val ** 2
+            #     trajectory_points.append([x_val, y_val_parabola])
 
         elif trajectory_type == SIGMOID:
             # Sigmoid: σ(x) = 2 / (1 + e^(-2x)) - 1, x in [0.0, 2.5]
@@ -48,6 +52,10 @@ class planner:
                 x_val = i
                 y_val_sigmoid = (2 / (1 + np.exp(-2 * x_val))) - 1
                 trajectory_points.append([x_val, y_val_sigmoid])
+            # for i in range(0, 26, 1):
+            #     x_val = i/10.0
+            #     y_val_sigmoid = (2 / (1 + np.exp(-2 * x_val))) - 1
+            #     trajectory_points.append([x_val, y_val_sigmoid])
 
         return trajectory_points
         

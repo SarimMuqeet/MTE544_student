@@ -42,7 +42,7 @@ class decision_maker(Node):
     
     
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=0.15, klv=0.2, kli=0.2, kap=0.5, kav=4, kai=0.2)
             self.planner=planner(TRAJECTORY_PLANNER)
 
         else:
@@ -74,12 +74,15 @@ class decision_maker(Node):
         # TODO Part 3: Check if you reached the goal
 
         # V1
-        target_linear_err = 1e-6
-        target_angular_err = 1e-6
+        target_linear_err = 0.05
+        target_angular_err = 0.05
+        # print("GOAL(S): {self.goal}")
         if type(self.goal) == list:
             reached_goal = False
+            if (calculate_linear_error(self.localizer.getPose(), self.goal[-1]) < target_linear_err):
+                reached_goal = True
         else: 
-            if (calculate_linear_error(self.localizer.getPose(), self.goal) < target_linear_err) and (calculate_angular_error(self.localizer.getPose(), self.goal)  < target_angular_err):
+            if (calculate_linear_error(self.localizer.getPose(), self.goal) < target_linear_err): #and (calculate_angular_error(self.localizer.getPose(), self.goal)  < target_angular_err):
                 reached_goal = True
             else:
                 reached_goal = False
@@ -118,6 +121,8 @@ class decision_maker(Node):
         # cmd_vel_msg.angular.z = updated_vel[1]
 
         # self.publisher.publish(cmd_vel_msg)
+        print(f"GetPose: {self.localizer.getPose()}, ")
+        # print(f"Linear error: {calculate_linear_error(self.localizer.getPose(), self.goal)}")
         
         # V2 - with trajectory in mind, also use pre-calculated velocity, yaw_rate
         #construct new twist message with these updated velocities
@@ -145,9 +150,9 @@ def main(args=None):
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
-        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[2,2], rate=10, motion_type=POINT_PLANNER)
+        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[1,1], rate=10, motion_type=POINT_PLANNER)
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[2,2], rate=10, motion_type=TRAJECTORY_PLANNER)
+        DM=decision_maker(twist_msg, twist_topic, qos_publisher=odom_qos, goalPoint=[1,1], rate=10, motion_type=TRAJECTORY_PLANNER)
     else:
         print("invalid motion type", file=sys.stderr)        
     
