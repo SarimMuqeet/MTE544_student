@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 from utilities import FileReader
 
-
-
+PLOT_TRAJECTORY = True
 
 def plot_errors(filename):
     
@@ -15,22 +14,40 @@ def plot_errors(filename):
     for val in values:
         time_list.append(val[-1] - first_stamp)
 
-    
-    
-    fig, axes = plt.subplots(1,2, figsize=(14,6))
+    if not PLOT_TRAJECTORY:
+        fig, axes = plt.subplots(1,2, figsize=(14,6))
+        fig.suptitle("Sigmoid: Angular Plots of Robot State Space and Individual Errors")
+
+        axes[0].plot([lin[0] for lin in values], [lin[1] for lin in values])
+        # axes[0].set_title("angular state space (e vs e_dot)")
+        axes[0].grid()
+           
+        axes[0].set_xlabel('e_dot')
+        axes[0].set_ylabel('e')
+        axes[1].set_title("individual state vs time (angular)")
+        for i in range(0, len(headers) - 1):
+            axes[1].plot(time_list, [lin[i] for lin in values], label= headers[i]+ " angular")
+        
+        axes[1].legend()
+        axes[1].grid()
+        axes[1].set_xlabel('time (s)')
+        axes[1].set_ylabel('value (m, m/s , m/^2 )')
+        axes[0].legend()
 
 
-    axes[0].plot([lin[0] for lin in values], [lin[1] for lin in values])
-    axes[0].set_title("state space")
-    axes[0].grid()
-
-    
-    axes[1].set_title("each individual state")
-    for i in range(0, len(headers) - 1):
-        axes[1].plot(time_list, [lin[i] for lin in values], label= headers[i]+ " linear")
-
-    axes[1].legend()
-    axes[1].grid()
+    #plotting trajectory now
+    if PLOT_TRAJECTORY:
+        fig, axes = plt.subplots(1,1, figsize=(14,6))
+        fig.suptitle("Plot of Robot xy Location and Commanded Sigmoid Trajectory ")
+        axes.plot([lin[0] for lin in values], [lin[1] for lin in values], label='Robot Pose')
+        # axes[0].set_title("angular state space (e vs e_dot)")
+        axes.grid()
+        
+        axes.set_xlabel('x')
+        axes.set_ylabel('y')
+        headers, values=FileReader("trajectory.csv").read_file()
+        axes.plot([lin[0] for lin in values], [lin[1] for lin in values], label ='Commanded Trajectory')
+        axes.legend()
 
     plt.show()
     
