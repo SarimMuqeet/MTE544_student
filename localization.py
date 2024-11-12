@@ -122,6 +122,7 @@ class localization(Node):
 
         # TODO Part 4: log your data
         #xhat in order: x, y, th, w, v, vdot
+        #calc individual values and arrange in order of headers in logger
         kf_vx = xhat[4]
         kf_w = xhat[3]
         kf_ax = xhat[5]
