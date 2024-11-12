@@ -11,7 +11,7 @@ class TrajectoryGenerator:
         # Hardcoded for now
         trajectory_type = PARABOLA  # Change to SIGMOID to test the other trajectory
 
-        if trajectory_type == PARABOLA:
+        if trajectory_type == SIGMOID:
             # Parabola: y = x^2, x in [0.0, 1.5]
             for i in np.arange(0.0, 1.6, 0.1):
                 x_val = i

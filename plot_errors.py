@@ -50,12 +50,6 @@ def plot_errors(filename):
         axes.legend()
 
     plt.show()
-    
-    
-
-
-
-
 
 import argparse
 
