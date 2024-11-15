@@ -64,7 +64,7 @@ class kalman_filter:
             w,
             v  + vdot*dt,
             vdot,
-        ])
+        ], dtype=float)
         
 
 
@@ -76,14 +76,14 @@ class kalman_filter:
         #to check via testing
         # partial derivatives of row wrt col, simialr to lec slides 
         return np.array([
-            #x, y,               th, w,             v, vdot
-            [1, 0,              -v*np.sin(th)*dt, 0,          np.cos(th)*dt,  0],
-            [0, 1,              v*np.cos(th)*dt, 0,          np.sin(th)*dt,  0],
-            [0, 0,                1, dt,           0,  0],
-            [0, 0,                0, 1,            0,  0],
-            [0, 0,                0, 0,            1,  dt],
-            [0, 0,                0, 0,            0,  1 ]
-        ])
+            #x, y,               th,                w,             v,           vdot
+            [1, 0,              -v*np.sin(th)*dt,   0,          np.cos(th)*dt,  0],
+            [0, 1,              v*np.cos(th)*dt,    0,          np.sin(th)*dt,  0],
+            [0, 0,                1,                dt,           0,            0],
+            [0, 0,                0,                1,            0,            0],
+            [0, 0,                0,                0,            1,            dt],
+            [0, 0,                0,                0,            0,            1]
+        ], dtype=float)
     
     
     # TODO Part 3: Implement here the jacobian of the H matrix (measurements)    
@@ -96,7 +96,7 @@ class kalman_filter:
             [0,0,0  , 1, 0, 0], # w
             [0,0,0  , 0, 0, 1], # ax
             [0,0,0  , v, w, 0], # ay
-        ])
+        ], dtype=float)
         
     # TODO Part 3: return the states here    
     def get_states(self):
