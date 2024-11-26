@@ -73,9 +73,27 @@ class localization(Node):
             
             # TODO PART 5 Bonus put the Q and R matrices
             # that you conclude from lab Three
-            Q=...
-            R=...
-            P=...
+            Q_factor = 0.5
+            Q = np.array([
+                [1, 0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0, 0],
+                [0, 0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 1],
+            ], dtype=float)
+            Q *= Q_factor
+
+            R_factor = 0.2
+            R = np.array([
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ], dtype=float)
+            R *= R_factor
+
+            P=Q
                         
             self.kf=kalman_filter(P,Q,R, x)
             
@@ -101,6 +119,18 @@ class localization(Node):
                             xhat[1],
                             normalize_angle(xhat[2]),
                             odom_msg.header.stamp])
+        
+        # TODO FROM LAB 3: log your data ---------------- TO VERIFY
+        #xhat in order: x, y, th, w, v, vdot
+        kf_vx = xhat[4]
+        kf_w = xhat[3]
+        kf_ax = xhat[5]
+        kf_ay = kf_vx*kf_w
+        kf_x = xhat[0]
+        kf_y = xhat[1]
+        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
+
+        self.loc_logger.log_values([z[2], z[3], kf_ax, kf_ay, kf_vx, kf_w, kf_x, kf_y, timestamp])
         
     def odom_callback(self, pose_msg):
         
