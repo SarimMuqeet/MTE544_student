@@ -204,7 +204,7 @@ def search(maze, start, end):
             # TODO PART 4 Create the f, g, and h values
             child.g = current_node.g + 1 #parent node g + 1 (each move moves 1)
             # Heuristic costs calculated here, this is using eucledian distance
-            child.h = heuristic(child, end)
+            child.h = heuristic(child.position, end)
 
             child.f = child.g + child.h
 

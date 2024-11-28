@@ -46,8 +46,7 @@ class decision_maker(Node):
         self.reachThreshold=0.1 #arbitrary val
 
         # TODO PART 5 your localization type
-        time_step = 0.1
-        self.localizer=localization(type=kalmanFilter, dt=time_step)
+        self.localizer=localization(type=kalmanFilter)
 
 
         
